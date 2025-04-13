@@ -1,0 +1,1445 @@
+<!DOCTYPE html><html lang="en"><head>    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>NeoTech Gaming | Home</title>    <!-- Font Awesome -->    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <!-- Fonts -->    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">    <!-- Three.js for 3D effects -->    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>    <!-- Tailwind CSS -->    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Terminal Intro Styles -->
+    <style>
+        #terminal-intro {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 9999;
+            font-family: 'Share Tech Mono', monospace;
+            color: #0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #terminal-content {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        .terminal-line {
+            margin: 0;
+            line-height: 1.5;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .typing {
+            animation: typing-effect 1.5s steps(30, end);
+        }
+        
+        .cursor::after {
+            content: "_";
+            opacity: 1;
+            animation: blink-cursor 0.7s infinite;
+        }
+        
+        .success {
+            color: #0f0;
+        }
+        
+        .error {
+            color: #f00;
+        }
+        
+        .warning {
+            color: #ff0;
+        }
+        
+        .info {
+            color: #0ff;
+        }
+        
+        @keyframes typing-effect {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-cursor {
+            0%, 100% { opacity: 1 }
+            50% { opacity: 0 }
+        }
+        
+        #matrix-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        .glitch {
+            position: relative;
+            animation: glitch-skew 1s infinite linear alternate-reverse;
+        }
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            clip: rect(44px, 450px, 56px, 0);
+        }
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00ffff;
+            animation: glitch-anim2 1s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(31px, 9999px, 14px, 0); transform: skew(0.58deg); }
+            5% { clip: rect(67px, 9999px, 75px, 0); transform: skew(0.34deg); }
+            10% { clip: rect(84px, 9999px, 85px, 0); transform: skew(0.3deg); }
+            15% { clip: rect(17px, 9999px, 37px, 0); transform: skew(0.94deg); }
+            20% { clip: rect(33px, 9999px, 91px, 0); transform: skew(0.41deg); }
+            25% { clip: rect(7px, 9999px, 34px, 0); transform: skew(0.67deg); }
+            30% { clip: rect(38px, 9999px, 19px, 0); transform: skew(0.93deg); }
+            35% { clip: rect(82px, 9999px, 37px, 0); transform: skew(0.58deg); }
+            40% { clip: rect(96px, 9999px, 59px, 0); transform: skew(0.57deg); }
+            45% { clip: rect(25px, 9999px, 49px, 0); transform: skew(0.3deg); }
+            50% { clip: rect(75px, 9999px, 100px, 0); transform: skew(0.31deg); }
+            55% { clip: rect(22px, 9999px, 33px, 0); transform: skew(0.59deg); }
+            60% { clip: rect(80px, 9999px, 86px, 0); transform: skew(0.42deg); }
+            65% { clip: rect(57px, 9999px, 32px, 0); transform: skew(0.58deg); }
+            70% { clip: rect(83px, 9999px, 14px, 0); transform: skew(0.68deg); }
+            75% { clip: rect(23px, 9999px, 6px, 0); transform: skew(0.33deg); }
+            80% { clip: rect(75px, 9999px, 85px, 0); transform: skew(0.7deg); }
+            85% { clip: rect(40px, 9999px, 30px, 0); transform: skew(0.84deg); }
+            90% { clip: rect(65px, 9999px, 96px, 0); transform: skew(0.28deg); }
+            95% { clip: rect(5px, 9999px, 79px, 0); transform: skew(0.61deg); }
+            100% { clip: rect(7px, 9999px, 61px, 0); transform: skew(0.69deg); }
+        }
+        
+        @keyframes glitch-anim2 {
+            0% { clip: rect(21px, 9999px, 94px, 0); transform: skew(0.48deg); }
+            5% { clip: rect(87px, 9999px, 65px, 0); transform: skew(0.94deg); }
+            10% { clip: rect(84px, 9999px, 75px, 0); transform: skew(0.5deg); }
+            15% { clip: rect(17px, 9999px, 17px, 0); transform: skew(0.64deg); }
+            20% { clip: rect(73px, 9999px, 11px, 0); transform: skew(0.61deg); }
+            25% { clip: rect(77px, 9999px, 64px, 0); transform: skew(0.57deg); }
+            30% { clip: rect(28px, 9999px, 79px, 0); transform: skew(0.53deg); }
+            35% { clip: rect(52px, 9999px, 77px, 0); transform: skew(0.48deg); }
+            40% { clip: rect(96px, 9999px, 79px, 0); transform: skew(0.27deg); }
+            45% { clip: rect(35px, 9999px, 39px, 0); transform: skew(0.8deg); }
+            50% { clip: rect(95px, 9999px, 60px, 0); transform: skew(0.91deg); }
+            55% { clip: rect(42px, 9999px, 23px, 0); transform: skew(0.69deg); }
+            60% { clip: rect(50px, 9999px, 86px, 0); transform: skew(0.32deg); }
+            65% { clip: rect(77px, 9999px, 42px, 0); transform: skew(0.68deg); }
+            70% { clip: rect(23px, 9999px, 54px, 0); transform: skew(0.38deg); }
+            75% { clip: rect(13px, 9999px, 36px, 0); transform: skew(0.73deg); }
+            80% { clip: rect(25px, 9999px, 65px, 0); transform: skew(0.6deg); }
+            85% { clip: rect(40px, 9999px, 90px, 0); transform: skew(0.54deg); }
+            90% { clip: rect(65px, 9999px, 26px, 0); transform: skew(0.58deg); }
+            95% { clip: rect(5px, 9999px, 79px, 0); transform: skew(0.21deg); }
+            100% { clip: rect(17px, 9999px, 11px, 0); transform: skew(0.29deg); }
+        }
+        
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); }
+            10% { transform: skew(-1deg); }
+            20% { transform: skew(2deg); }
+            30% { transform: skew(-1deg); }
+            40% { transform: skew(2deg); }
+            50% { transform: skew(0deg); }
+            60% { transform: skew(0deg); }
+            70% { transform: skew(-1deg); }
+            80% { transform: skew(1deg); }
+            90% { transform: skew(-1deg); }
+            100% { transform: skew(0deg); }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #111;
+            margin: 10px 0;
+            border: 1px solid #0f0;
+            position: relative;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            width: 0;
+            background-color: #0f0;
+            transition: width 0.5s;
+        }
+        
+        .progress-bar-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            line-height: 20px;
+            color: #fff;
+        }
+        
+        .scanline {
+            width: 100%;
+            height: 4px;
+            position: absolute;
+            background: rgba(0, 255, 0, 0.3);
+            opacity: 0.3;
+            pointer-events: none;
+            animation: scanline 6s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% {
+                top: 0%;
+            }
+            100% {
+                top: 100%;
+            }
+        }
+        
+        .terminal-flicker {
+            animation: flicker 0.3s infinite;
+        }
+        
+        @keyframes flicker {
+            0% { opacity: 0.9; }
+            20% { opacity: 1; }
+            40% { opacity: 0.95; }
+            60% { opacity: 0.98; }
+            80% { opacity: 0.9; }
+            100% { opacity: 1; }
+        }
+        
+        #continue-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: transparent;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 10px 20px;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+            display: none;
+            transition: background-color 0.3s;
+        }
+        
+        #continue-btn:hover {
+            background-color: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 10px #0f0;
+        }
+    </style>
+    <script>        tailwind.config = {            theme: {                extend: {                    colors: {                        'game-primary': '#00FFFF',    /* Cyan - Primary accent */                        'game-secondary': '#FF00FF',  /* Magenta - Secondary accent */                        'game-accent': '#FFFF00',     /* Yellow accent */                        'game-dark': '#121212',       /* Near black */                        'game-darker': '#000000',     /* Pure black */                        'game-gray': '#888888',       /* Medium gray */                        'game-neon-green': '#39FF14', /* Neon green */                        'game-purple': '#9900EF',     /* Purple */                        'game-pink': '#FF0066',       /* Pink */                    },                    boxShadow: {                        'neon': '0 0 5px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.2)',                        'neon-hover': '0 0 10px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.5), 0 0 50px rgba(0, 255, 255, 0.3)',                        'neon-strong': '0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.4), 0 0 30px rgba(0, 255, 255, 0.2), 0 0 40px rgba(0, 255, 255, 0.1)',                        'neon-red': '0 0 5px rgba(255, 0, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.2)',                    },                    animation: {                        'float': 'float 3s ease-in-out infinite',                        'float-delayed': 'float 3s ease-in-out 1.5s infinite',                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',                        'scanner': 'scanner 2.5s ease-in-out infinite',                        'glitch': 'glitch 1s linear infinite',                        'typing': 'typing 3.5s steps(30, end), blink .75s step-end infinite',                    },                    keyframes: {                        float: {                            '0%, 100%': { transform: 'translateY(0) rotate(3deg)' },                            '50%': { transform: 'translateY(-10px) rotate(3deg)' },                        },                        scanner: {                            '0%': { top: '0%', opacity: '0.6' },                            '50%': { top: '90%', opacity: '0.2' },                            '100%': { top: '0%', opacity: '0.6' },                        },                        glitch: {                            '0%': { transform: 'translate(0)' },                            '20%': { transform: 'translate(-2px, 2px)' },                            '40%': { transform: 'translate(-2px, -2px)' },                            '60%': { transform: 'translate(2px, 2px)' },                            '80%': { transform: 'translate(2px, -2px)' },                            '100%': { transform: 'translate(0)' },                        },                        typing: {                            'from': { width: '0' },                            'to': { width: '100%' }                        },                        blink: {                            'from, to': { borderColor: 'transparent' },                            '50%': { borderColor: '#00FFFF' }                        }                    },                }            }        }    </script>
+</head><body class="crt-effect">    <!-- Terminal Intro Overlay -->    <div id="terminal-intro">        <canvas id="matrix-canvas"></canvas>        <div class="scanline"></div>        <div id="terminal-content">            <!-- Terminal content will be dynamically added here -->        </div>        <button id="continue-btn">ACCESS GRANTED [ENTER]</button>    </div>
+
+    <!-- Audio elements for sound effects -->
+    <audio id="typing-sound" preload="auto">
+        <source src="https://www.soundjay.com/mechanical/sounds/typewriter-1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="beep-sound" preload="auto">
+        <source src="https://www.soundjay.com/button/sounds/beep-07.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="access-sound" preload="auto">
+        <source src="https://www.soundjay.com/button/sounds/button-10.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="error-sound" preload="auto">
+        <source src="https://www.soundjay.com/button/sounds/button-3.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="success-sound" preload="auto">
+        <source src="https://www.soundjay.com/mechanical/sounds/machine-switch-6.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="alert-sound" preload="auto">
+        <source src="https://www.soundjay.com/button/sounds/button-35.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="ambient-sound" preload="auto" loop>
+        <source src="https://soundbible.com/mp3/Computer_Ambience-GlorySunz-1266072353.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Terminal script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize terminal when page loads
+            initTerminal();
+            
+            // Start matrix canvas
+            startMatrix();
+            
+            // Terminal initialization function
+            function initTerminal() {
+                const terminal = document.getElementById('terminal-content');
+                const typingSound = document.getElementById('typing-sound');
+                const beepSound = document.getElementById('beep-sound');
+                const accessSound = document.getElementById('access-sound');
+                const errorSound = document.getElementById('error-sound');
+                const successSound = document.getElementById('success-sound');
+                const alertSound = document.getElementById('alert-sound');
+                const ambientSound = document.getElementById('ambient-sound');
+                const continueBtn = document.getElementById('continue-btn');
+                
+                // Play ambient sound with low volume
+                ambientSound.volume = 0.2;
+                ambientSound.play().catch(e => console.log('Audio play failed: User interaction needed'));
+                
+                // Commands and responses to simulate
+                const terminalSequence = [
+                    { text: "INITIALIZING SYSTEM...", type: "info", delay: 500 },
+                    { text: "ESTABLISHING CONNECTION...", type: "info", delay: 1000 },
+                    { text: "CONNECTING TO SECURE SERVER: gaming.neotech.net", type: "command", delay: 800 },
+                    { text: "CONNECTION ESTABLISHED", type: "success", delay: 600, sound: beepSound },
+                    { text: "ATTEMPTING SECURITY BYPASS...", type: "warning", delay: 1000 },
+                    { text: "FIREWALL DETECTED. INITIATING COUNTERMEASURES...", type: "warning", delay: 1200, sound: alertSound },
+                    { progress: "BYPASSING SECURITY", duration: 2000, sound: beepSound },
+                    { text: "ACCESS LEVEL 1 ACHIEVED", type: "success", delay: 500, sound: successSound },
+                    { text: "SCANNING FOR VULNERABILITIES...", type: "command", delay: 800 },
+                    { text: "MULTIPLE ENTRY POINTS DETECTED", type: "success", delay: 600 },
+                    { text: "INITIATING DEEP SCAN OF DATABASE...", type: "command", delay: 1000 },
+                    { progress: "DATABASE INFILTRATION", duration: 2500, sound: beepSound },
+                    { text: "DECRYPTING USER CREDENTIALS...", type: "warning", delay: 1000, sound: beepSound },
+                    { text: "ERROR: ADVANCED ENCRYPTION DETECTED", type: "error", delay: 800, sound: errorSound },
+                    { text: "DEPLOYING QUANTUM DECRYPTION ALGORITHM...", type: "command", delay: 1200 },
+                    { progress: "DECRYPTION PROGRESS", duration: 3000, sound: beepSound },
+                    { text: "ADMIN ACCESS GRANTED", type: "success", delay: 500, sound: successSound },
+                    { text: "DOWNLOADING SECURE FILES...", type: "command", delay: 1000 },
+                    { text: "RETRIEVING GAME DATABASE...", type: "info", delay: 800 },
+                    { progress: "FILE TRANSFER", duration: 2000, sound: beepSound },
+                    { text: "DOWNLOAD COMPLETE: 1,457 FILES TRANSFERRED", type: "success", delay: 600, sound: successSound },
+                    { text: "SECURING CONNECTION PATHWAY...", type: "command", delay: 800 },
+                    { text: "ERASING DIGITAL FOOTPRINT...", type: "warning", delay: 1000 },
+                    { text: "NO TRACE PROTOCOL ACTIVATED", type: "success", delay: 500, sound: beepSound },
+                    { text: "INITIALIZING NEURAL INTERFACE...", type: "info", delay: 1200 },
+                    { progress: "CYBERNETIC INTEGRATION", duration: 2500, sound: beepSound },
+                    { text: "SYSTEM READY. SECURITY MEASURES DEACTIVATED.", type: "success", delay: 500, sound: successSound },
+                    { glitch: "ACCESS GRANTED - WELCOME TO NEOTECH GAMING", delay: 1000, sound: accessSound },
+                    { text: "PRESS ENTER TO ACCESS THE SYSTEM", type: "command", delay: 800, final: true }
+                ];
+                
+                let currentIndex = 0;
+                
+                // Process the next item in the terminal sequence
+                function processNextItem() {
+                    if (currentIndex >= terminalSequence.length) {
+                        return;
+                    }
+                    
+                    const item = terminalSequence[currentIndex];
+                    currentIndex++;
+                    
+                    if (item.sound) {
+                        item.sound.currentTime = 0;
+                        item.sound.play().catch(e => console.log('Audio play failed'));
+                    }
+                    
+                    if (item.text) {
+                        addTerminalLine(item.text, item.type);
+                        
+                        if (item.final) {
+                            setTimeout(() => {
+                                continueBtn.style.display = 'block';
+                            }, item.delay);
+                        } else {
+                            setTimeout(processNextItem, item.delay);
+                        }
+                    } else if (item.progress) {
+                        addProgressBar(item.progress, item.duration);
+                        setTimeout(processNextItem, item.duration + 300);
+                    } else if (item.glitch) {
+                        addGlitchText(item.glitch);
+                        setTimeout(processNextItem, item.delay);
+                    }
+                }
+                
+                // Add a new line to the terminal
+                function addTerminalLine(text, type) {
+                    const line = document.createElement('div');
+                    line.className = `terminal-line ${type} typing`;
+                    
+                    if (type === 'command') {
+                        line.innerHTML = `<span style="color: #0ff;">></span> ${text}`;
+                    } else {
+                        line.textContent = text;
+                    }
+                    
+                    terminal.appendChild(line);
+                    terminal.scrollTop = terminal.scrollHeight;
+                    
+                    // Play typing sound
+                    typingSound.currentTime = 0;
+                    typingSound.play().catch(e => console.log('Audio play failed'));
+                    
+                    // Simulate typing effect
+                    simulateTyping(line, text.length, 40);
+                }
+                
+                // Add a glitch text effect
+                function addGlitchText(text) {
+                    const line = document.createElement('div');
+                    line.className = 'terminal-line';
+                    line.innerHTML = `<h1 class="glitch" data-text="${text}">${text}</h1>`;
+                    terminal.appendChild(line);
+                    terminal.scrollTop = terminal.scrollHeight;
+                }
+                
+                // Add a progress bar to the terminal
+                function addProgressBar(text, duration) {
+                    const progressContainer = document.createElement('div');
+                    progressContainer.innerHTML = `
+                        <div class="terminal-line">${text}</div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill"></div>
+                            <div class="progress-bar-text">0%</div>
+                        </div>
+                    `;
+                    terminal.appendChild(progressContainer);
+                    terminal.scrollTop = terminal.scrollHeight;
+                    
+                    const progressBar = progressContainer.querySelector('.progress-bar-fill');
+                    const progressText = progressContainer.querySelector('.progress-bar-text');
+                    
+                    // Animate the progress bar
+                    let progress = 0;
+                    const interval = setInterval(() => {
+                        progress += 1;
+                        progressBar.style.width = `${progress}%`;
+                        progressText.textContent = `${progress}%`;
+                        
+                        if (progress >= 100) {
+                            clearInterval(interval);
+                        }
+                    }, duration / 100);
+                }
+                
+                // Simulate typing effect
+                function simulateTyping(element, length, speed) {
+                    element.style.width = '0';
+                    let width = 0;
+                    const interval = setInterval(() => {
+                        width += 5;
+                        element.style.width = `${width}%`;
+                        
+                        if (width >= 100) {
+                            clearInterval(interval);
+                            element.classList.remove('typing');
+                            element.classList.add('cursor');
+                            
+                            setTimeout(() => {
+                                element.classList.remove('cursor');
+                            }, 1000);
+                        }
+                    }, speed);
+                }
+                
+                // Start the terminal sequence
+                setTimeout(processNextItem, 1000);
+                
+                // Set up continue button
+                continueBtn.addEventListener('click', function() {
+                    successSound.play().catch(e => console.log('Audio play failed'));
+                    
+                    // Fade out the terminal intro
+                    const terminalIntro = document.getElementById('terminal-intro');
+                    terminalIntro.style.transition = 'opacity 1s';
+                    terminalIntro.style.opacity = '0';
+                    
+                    // After fade out, hide the terminal
+                    setTimeout(() => {
+                        terminalIntro.style.display = 'none';
+                        // Fade out ambient sound
+                        const fadeAudio = setInterval(() => {
+                            if (ambientSound.volume > 0.1) {
+                                ambientSound.volume -= 0.1;
+                            } else {
+                                ambientSound.pause();
+                                clearInterval(fadeAudio);
+                            }
+                        }, 100);
+                    }, 1000);
+                });
+                
+                // Allow pressing enter to continue
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' && continueBtn.style.display === 'block') {
+                        continueBtn.click();
+                    }
+                });
+            }
+            
+            // Matrix canvas animation
+            function startMatrix() {
+                const canvas = document.getElementById('matrix-canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                
+                const characters = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+                const fontSize = 14;
+                const columns = Math.floor(canvas.width / fontSize);
+                const drops = [];
+                
+                for (let i = 0; i < columns; i++) {
+                    drops[i] = Math.floor(Math.random() * canvas.height);
+                }
+                
+                function draw() {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.fillStyle = '#0f0';
+                    ctx.font = `${fontSize}px monospace`;
+                    
+                    for (let i = 0; i < drops.length; i++) {
+                        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                        
+                        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                            drops[i] = 0;
+                        }
+                        
+                        drops[i]++;
+                    }
+                }
+                
+                setInterval(draw, 35);
+                
+                // Resize handler
+                window.addEventListener('resize', function() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                });
+            }
+        });
+    </script>
+
+    <!-- Navigation -->
+    <header class="bg-game-darker relative z-50 border-b border-game-primary/20">        <nav class="container mx-auto px-4 py-3">            <div class="flex justify-between items-center flex-wrap">                <!-- Logo -->                <a href="#" class="flex items-center space-x-2">                    <div class="relative w-10 h-10">                        <div class="absolute inset-0 bg-gradient-to-tr from-game-primary to-game-secondary rounded-md animate-pulse-slow"></div>                        <div class="absolute inset-0.5 bg-game-darker rounded-md flex items-center justify-center">                            <span class="text-2xl font-bold text-game-primary">N</span>                        </div>                    </div>                    <span class="text-2xl font-bold gradient-text">NeoTech</span>                </a>                                <!-- Desktop Navigation -->                <div class="hidden md:flex items-center space-x-8">                    <a href="#" class="text-white hover:text-game-primary text-sm uppercase font-medium tracking-wider transition-colors duration-200 relative group py-4">                        Home                        <span class="absolute bottom-3 left-0 w-0 h-0.5 bg-game-primary transition-all duration-200 group-hover:w-full shadow-neon"></span>                    </a>                    <a href="#" class="text-white hover:text-game-primary text-sm uppercase font-medium tracking-wider transition-colors duration-200 relative group py-4">                        Games                        <span class="absolute bottom-3 left-0 w-0 h-0.5 bg-game-primary transition-all duration-200 group-hover:w-full shadow-neon"></span>                    </a>                    <a href="#" class="text-white hover:text-game-primary text-sm uppercase font-medium tracking-wider transition-colors duration-200 relative group py-4">                        Hardware                        <span class="absolute bottom-3 left-0 w-0 h-0.5 bg-game-primary transition-all duration-200 group-hover:w-full shadow-neon"></span>                    </a>                    <a href="#" class="text-white hover:text-game-primary text-sm uppercase font-medium tracking-wider transition-colors duration-200 relative group py-4">                        VR Experience                        <span class="absolute bottom-3 left-0 w-0 h-0.5 bg-game-primary transition-all duration-200 group-hover:w-full shadow-neon"></span>                    </a>                </div>                                <!-- Mobile Navigation -->                <div class="md:hidden w-full mt-4 flex justify-center space-x-6">                    <a href="#" class="text-white hover:text-game-primary text-xs uppercase font-medium">Home</a>                    <a href="#" class="text-white hover:text-game-primary text-xs uppercase font-medium">Games</a>                    <a href="#" class="text-white hover:text-game-primary text-xs uppercase font-medium">Hardware</a>                </div>                                <!-- Action Buttons -->                <div class="hidden md:flex items-center space-x-3">                    <a href="#" class="relative cyberpunk-btn bg-transparent border border-game-primary px-4 py-2 text-sm font-medium text-game-primary hover:bg-game-primary/10 transition duration-200 shadow-neon">                        <span class="relative z-10">Login</span>                    </a>                    <a href="#" class="relative cyberpunk-btn bg-gradient-to-r from-game-primary to-game-secondary px-5 py-2 text-sm font-medium text-game-darker hover:shadow-neon-hover transition duration-200">                        <span class="relative z-10">Sign Up</span>                    </a>                    <button class="relative p-2 text-white hover:text-game-primary transition duration-200">                        <i class="fas fa-shopping-cart"></i>                        <span class="absolute -top-1 -right-1 bg-game-secondary text-xs w-4 h-4 rounded-full flex items-center justify-center shadow-neon-red">3</span>                    </button>                </div>            </div>        </nav>    </header>    <!-- Hero Section -->    <div class="relative bg-game-darker overflow-hidden">        <!-- Animated background elements -->        <div class="absolute inset-0 overflow-hidden">            <div class="matrix-bg"></div>            <div class="scanner-effect opacity-20"></div>            <div class="absolute inset-0 bg-gradient-to-b from-game-darker via-transparent to-game-darker"></div>        </div>
+        <canvas id="matrixRain" class="absolute inset-0 w-full h-full opacity-20"></canvas>
+        <div class="circuit-pattern"></div>
+        <div class="scanlines"></div>
+        <div class="scanner-line"></div>
+
+        <div class="container mx-auto px-4 py-20 lg:py-32 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center justify-between">
+                <!-- Left Content -->
+                <div class="w-full lg:w-1/2 text-center lg:text-left mb-12 lg:mb-0 perspective-container">
+                    <div class="inline-block mb-2 px-3 py-1 bg-game-primary/10 border-l-2 border-game-primary text-game-primary text-xs uppercase tracking-widest font-medium">Next Generation</div>
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4 glitch-container">
+                        <span class="text-white">Ultimate <span class="text-glitch glitching" data-text="Gaming">Gaming</span></span>
+                        <br>
+                        <span class="gradient-text cyberpunk-shadow">Experience</span>
+                    </h1>
+                    <div class="w-20 h-1 bg-gradient-to-r from-game-primary to-game-secondary my-6 mx-auto lg:mx-0 glow-line"></div>
+                    
+                    <p class="text-gray-300 text-lg mb-8 max-w-lg mx-auto lg:mx-0">
+                        Dive into the future of gaming with our cutting-edge <span class="text-game-neon-green">VR technology</span> and <span class="text-game-pink">immersive experiences</span> that blur the line between reality and fiction.
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                        <a href="#" class="cyberpunk-btn bg-gradient-to-r from-game-primary to-game-secondary px-8 py-3 font-medium text-game-darker shadow-neon-hover">
+                            <i class="fas fa-gamepad mr-2"></i> Explore Games
+                        </a>
+                        <a href="#" class="cyberpunk-btn bg-transparent border border-game-secondary px-8 py-3 font-medium text-game-secondary hover:bg-game-secondary/10 shadow-neon-red">
+                            <i class="fas fa-vr-cardboard mr-2"></i> VR Experience
+                        </a>
+                    </div>
+                    
+                    <!-- Hacking-style rotating counter stats -->
+                    <div class="mt-12 grid grid-cols-3 gap-4">
+                        <div class="counter-stat p-3 border border-game-primary/20 bg-game-darker/50 text-center">
+                            <div class="text-3xl font-bold text-game-primary typewriter" id="counter1">100+</div>
+                            <div class="text-xs uppercase text-gray-400 mt-1">Games</div>
+                        </div>
+                        <div class="counter-stat p-3 border border-game-secondary/20 bg-game-darker/50 text-center">
+                            <div class="text-3xl font-bold text-game-secondary typewriter" id="counter2">50k+</div>
+                            <div class="text-xs uppercase text-gray-400 mt-1">Players</div>
+                        </div>
+                        <div class="counter-stat p-3 border border-game-accent/20 bg-game-darker/50 text-center">
+                            <div class="text-3xl font-bold text-game-accent typewriter" id="counter3">24/7</div>
+                            <div class="text-xs uppercase text-gray-400 mt-1">Support</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Content - 3D Floating Game Console Image -->
+                <div class="w-full lg:w-1/2 relative perspective-container">
+                    <div class="floating-3d-image relative z-10">
+                        <img src="https://images.pexels.com/photos/8721342/pexels-photo-8721342.jpeg?auto=compress&cs=tinysrgb&w=1000" alt="Gaming VR Headset" class="w-full max-w-lg mx-auto">
+                        
+                        <!-- Animated overlays -->
+                        <div class="absolute top-0 left-0 w-full h-full">
+                            <div class="absolute top-1/4 left-1/4 w-1/2 h-1/2 border-2 border-game-primary animate-pulse opacity-50 rounded-full"></div>
+                            <div class="absolute top-1/3 left-1/3 w-1/3 h-1/3 border border-game-secondary animate-pulse-slow opacity-30 rounded-full"></div>
+                        </div>
+                        
+                        <!-- Technical details floating around -->
+                        <div class="hidden lg:block absolute -top-5 -left-5 bg-game-darker/80 border border-game-primary/30 p-2 text-xs text-game-primary shadow-neon animate-float">
+                            <div class="type-text">8K Ultra Resolution</div>
+                        </div>
+                        <div class="hidden lg:block absolute top-1/4 -right-10 bg-game-darker/80 border border-game-secondary/30 p-2 text-xs text-game-secondary shadow-neon-red animate-float-delayed">
+                            <div class="type-text">Neural Interface</div>
+                        </div>
+                        <div class="hidden lg:block absolute bottom-10 left-10 bg-game-darker/80 border border-game-accent/30 p-2 text-xs text-game-accent animate-float">
+                            <div class="type-text">Haptic Feedback</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 3D wireframe effect -->
+                    <div class="absolute inset-0 lg:inset-x-10 wireframe-effect opacity-10 z-0">
+                        <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                            <path d="M50,250 L450,250" stroke="#00FFFF" stroke-width="1" />
+                            <path d="M250,50 L250,450" stroke="#00FFFF" stroke-width="1" />
+                            <circle cx="250" cy="250" r="200" fill="none" stroke="#00FFFF" stroke-width="1" />
+                            <circle cx="250" cy="250" r="150" fill="none" stroke="#00FFFF" stroke-width="1" />
+                            <circle cx="250" cy="250" r="100" fill="none" stroke="#00FFFF" stroke-width="1" />
+                            <circle cx="250" cy="250" r="50" fill="none" stroke="#00FFFF" stroke-width="1" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Matrix code rain script -->
+        <script>
+        // Matrix code rain effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('matrixRain');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Characters to use in the Matrix code rain
+            const characters = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const columns = Math.floor(canvas.width / 15); // Character width + spacing
+            const drops = [];
+            
+            // Initialize drops at random positions
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.floor(Math.random() * canvas.height);
+            }
+            
+            function draw() {
+                // Set semi-transparent black background to create fading effect
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Set text color and font
+                ctx.fillStyle = '#0F0'; // Matrix green
+                ctx.font = '15px monospace';
+                
+                // Draw characters
+                for (let i = 0; i < drops.length; i++) {
+                    // Random character
+                    const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                    
+                    // Calculate x position
+                    const x = i * 15;
+                    
+                    // Calculate y position
+                    const y = drops[i] * 15;
+                    
+                    // Draw the character
+                    ctx.fillText(text, x, y);
+                    
+                    // Reset drop to top with random chance
+                    if (y > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    // Move drop down
+                    drops[i]++;
+                }
+            }
+            
+            // Run the animation
+            setInterval(draw, 35);
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        });
+
+        // Add counter animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const counterElements = [
+                document.getElementById('counter1'),
+                document.getElementById('counter2'),
+                document.getElementById('counter3')
+            ];
+            
+            // Simulate hacker-style counter animation
+            setInterval(() => {
+                counterElements.forEach(el => {
+                    if (el && Math.random() > 0.7) {
+                        const originalText = el.getAttribute('data-original') || el.textContent;
+                        el.setAttribute('data-original', originalText);
+                        
+                        // Show random characters briefly
+                        el.textContent = originalText.replace(/\d+/g, match => {
+                            return match.split('').map(() => 
+                                Math.floor(Math.random() * 10)
+                            ).join('');
+                        });
+                        
+                        // Reset after short delay
+                        setTimeout(() => {
+                            el.textContent = originalText;
+                        }, 100);
+                    }
+                });
+            }, 2000);
+        });
+        </script>
+    </div>
+    
+    <!-- Featured Games Section with enhanced 3D cards -->
+    <div class="py-20 relative overflow-hidden">
+        <!-- Background elements -->
+        <div class="absolute inset-0 bg-gradient-to-b from-game-darker to-game-dark opacity-50"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.1),transparent_70%)]"></div>
+        <div class="scanlines opacity-50"></div>
+        
+        <div class="container mx-auto px-4 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-bold mb-4">
+                    <span class="gradient-text">Featured</span> <span class="text-white text-glitch">Games</span>
+                </h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-game-primary to-game-secondary mx-auto"></div>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Experience the most immersive and technologically advanced games that will transport you to new worlds and realities.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Game Card 1 -->
+                <div class="group perspective-card">
+                    <div class="cyberpunk-card relative bg-game-darker border border-game-primary/30 rounded overflow-hidden transform transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-neon">
+                        <!-- Glitch overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-game-primary/5 to-game-primary/10 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        
+                        <!-- Game Image -->
+                        <div class="aspect-[3/4] relative overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                                 alt="Cyberpunk Game" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="scan-line absolute inset-0 pointer-events-none"></div>
+                            
+                            <!-- Overlay details -->
+                            <div class="absolute top-3 left-3 z-20">
+                                <span class="bg-game-primary/80 text-game-darker text-xs font-medium px-2 py-1">NEW</span>
+                            </div>
+                            <div class="absolute top-3 right-3 z-20">
+                                <span class="bg-game-darker/80 border border-game-primary/50 text-game-primary text-xs px-2 py-1 flex items-center gap-1">
+                                    <i class="fas fa-star"></i> 4.9
+                                </span>
+                            </div>
+                            
+                            <!-- Overlay gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-game-darker via-game-darker/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            <!-- Hover details -->
+                            <div class="absolute inset-0 flex flex-col justify-end p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                                <div class="cyberpunk-btn bg-game-primary/80 text-game-darker px-4 py-2 w-full text-center text-sm font-medium mb-3">
+                                    <i class="fas fa-gamepad mr-2"></i> Play Now
+                                </div>
+                                <div class="cyberpunk-btn bg-transparent border border-game-primary/50 text-game-primary px-4 py-2 w-full text-center text-sm font-medium">
+                                    <i class="fas fa-info-circle mr-2"></i> Details
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Game Info -->
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-bold text-white group-hover:text-game-primary transition-colors">NeoRunner 2077</h3>
+                                <span class="text-game-secondary text-sm font-mono">$59.99</span>
+                            </div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="bg-game-primary/20 text-game-primary text-xs px-2 py-0.5 rounded-sm">RPG</span>
+                                <span class="bg-game-secondary/20 text-game-secondary text-xs px-2 py-0.5 rounded-sm">Open World</span>
+                            </div>
+                            <div class="text-xs text-gray-400">Immerse yourself in a dystopian future where neural implants and corporate warfare define existence.</div>
+                        </div>
+                        
+                        <!-- Animated corner -->
+                        <div class="absolute top-0 right-0 w-10 h-10 overflow-hidden">
+                            <div class="absolute transform rotate-45 bg-game-primary text-game-darker font-bold text-xs py-1 text-center w-20 top-2 right-[-5px]">HOT</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Card 2 -->
+                <div class="group perspective-card">
+                    <div class="cyberpunk-card relative bg-game-darker border border-game-secondary/30 rounded overflow-hidden transform transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-neon-red">
+                        <!-- Glitch overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-game-secondary/5 to-game-secondary/10 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        
+                        <!-- Game Image -->
+                        <div class="aspect-[3/4] relative overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1547&q=80" 
+                                 alt="VR Game" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="scan-line absolute inset-0 pointer-events-none"></div>
+                            
+                            <!-- Overlay details -->
+                            <div class="absolute top-3 left-3 z-20">
+                                <span class="bg-game-secondary/80 text-game-darker text-xs font-medium px-2 py-1">VR</span>
+                            </div>
+                            <div class="absolute top-3 right-3 z-20">
+                                <span class="bg-game-darker/80 border border-game-secondary/50 text-game-secondary text-xs px-2 py-1 flex items-center gap-1">
+                                    <i class="fas fa-star"></i> 4.7
+                                </span>
+                            </div>
+                            
+                            <!-- Overlay gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-game-darker via-game-darker/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            <!-- Hover details -->
+                            <div class="absolute inset-0 flex flex-col justify-end p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                                <div class="cyberpunk-btn bg-game-secondary/80 text-game-darker px-4 py-2 w-full text-center text-sm font-medium mb-3">
+                                    <i class="fas fa-gamepad mr-2"></i> Play Now
+                                </div>
+                                <div class="cyberpunk-btn bg-transparent border border-game-secondary/50 text-game-secondary px-4 py-2 w-full text-center text-sm font-medium">
+                                    <i class="fas fa-info-circle mr-2"></i> Details
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Game Info -->
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-bold text-white group-hover:text-game-secondary transition-colors">Quantum Break</h3>
+                                <span class="text-game-secondary text-sm font-mono">$49.99</span>
+                            </div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="bg-game-primary/20 text-game-primary text-xs px-2 py-0.5 rounded-sm">Action</span>
+                                <span class="bg-game-secondary/20 text-game-secondary text-xs px-2 py-0.5 rounded-sm">Sci-Fi</span>
+                            </div>
+                            <div class="text-xs text-gray-400">Manipulate time and space in this reality-bending adventure with cutting-edge VR technology.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Card 3 -->
+                <div class="group perspective-card">
+                    <div class="cyberpunk-card relative bg-game-darker border border-game-accent/30 rounded overflow-hidden transform transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-neon">
+                        <!-- Glitch overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-game-accent/5 to-game-accent/10 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        
+                        <!-- Game Image -->
+                        <div class="aspect-[3/4] relative overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1640955014216-75201056c829?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" 
+                                 alt="Strategy Game" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="scan-line absolute inset-0 pointer-events-none"></div>
+                            
+                            <!-- Overlay details -->
+                            <div class="absolute top-3 left-3 z-20">
+                                <span class="bg-game-accent/80 text-game-darker text-xs font-medium px-2 py-1">POPULAR</span>
+                            </div>
+                            <div class="absolute top-3 right-3 z-20">
+                                <span class="bg-game-darker/80 border border-game-accent/50 text-game-accent text-xs px-2 py-1 flex items-center gap-1">
+                                    <i class="fas fa-star"></i> 4.8
+                                </span>
+                            </div>
+                            
+                            <!-- Overlay gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-game-darker via-game-darker/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            <!-- Hover details -->
+                            <div class="absolute inset-0 flex flex-col justify-end p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                                <div class="cyberpunk-btn bg-game-accent/80 text-game-darker px-4 py-2 w-full text-center text-sm font-medium mb-3">
+                                    <i class="fas fa-gamepad mr-2"></i> Play Now
+                                </div>
+                                <div class="cyberpunk-btn bg-transparent border border-game-accent/50 text-game-accent px-4 py-2 w-full text-center text-sm font-medium">
+                                    <i class="fas fa-info-circle mr-2"></i> Details
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Game Info -->
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-bold text-white group-hover:text-game-accent transition-colors">Synthwave Racer</h3>
+                                <span class="text-game-accent text-sm font-mono">$39.99</span>
+                            </div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="bg-game-primary/20 text-game-primary text-xs px-2 py-0.5 rounded-sm">Racing</span>
+                                <span class="bg-game-accent/20 text-game-accent text-xs px-2 py-0.5 rounded-sm">Arcade</span>
+                            </div>
+                            <div class="text-xs text-gray-400">Speed through neon-drenched streets in a retro-futuristic racing experience with synthwave soundtrack.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Card 4 -->
+                <div class="group perspective-card">
+                    <div class="cyberpunk-card relative bg-game-darker border border-game-neon-green/30 rounded overflow-hidden transform transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-neon">
+                        <!-- Glitch overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-game-neon-green/5 to-game-neon-green/10 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        
+                        <!-- Game Image -->
+                        <div class="aspect-[3/4] relative overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                                 alt="Tactical Game" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="scan-line absolute inset-0 pointer-events-none"></div>
+                            
+                            <!-- Overlay details -->
+                            <div class="absolute top-3 left-3 z-20">
+                                <span class="bg-game-neon-green/80 text-game-darker text-xs font-medium px-2 py-1">COMING SOON</span>
+                            </div>
+                            <div class="absolute top-3 right-3 z-20">
+                                <span class="bg-game-darker/80 border border-game-neon-green/50 text-game-neon-green text-xs px-2 py-1 flex items-center gap-1">
+                                    <i class="fas fa-users"></i> MMO
+                                </span>
+                            </div>
+                            
+                            <!-- Overlay gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-game-darker via-game-darker/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            <!-- Hover details -->
+                            <div class="absolute inset-0 flex flex-col justify-end p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                                <div class="cyberpunk-btn bg-game-neon-green/80 text-game-darker px-4 py-2 w-full text-center text-sm font-medium mb-3">
+                                    <i class="fas fa-clock mr-2"></i> Pre-order
+                                </div>
+                                <div class="cyberpunk-btn bg-transparent border border-game-neon-green/50 text-game-neon-green px-4 py-2 w-full text-center text-sm font-medium">
+                                    <i class="fas fa-info-circle mr-2"></i> Details
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Game Info -->
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-bold text-white group-hover:text-game-neon-green transition-colors">Echo Protocol</h3>
+                                <span class="text-game-neon-green text-sm font-mono">$69.99</span>
+                            </div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="bg-game-primary/20 text-game-primary text-xs px-2 py-0.5 rounded-sm">Strategy</span>
+                                <span class="bg-game-neon-green/20 text-game-neon-green text-xs px-2 py-0.5 rounded-sm">Tactical</span>
+                            </div>
+                            <div class="text-xs text-gray-400">Lead a team of elite hackers through corporate networks in this team-based tactical strategy game.</div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+             
+             <!-- View More Button -->
+             <div class="mt-12 text-center">
+                <a href="#" class="inline-block cyberpunk-btn bg-transparent border border-game-primary px-8 py-3 font-medium text-game-primary hover:bg-game-primary/10 group">
+                    View All Games
+                    <i class="fas fa-chevron-right ml-2 transition-transform group-hover:translate-x-1"></i>
+                </a>
+             </div>
+          </div>
+     </div>
+     <!-- Category Cards -->
+    <section class="py-16 bg-gradient-to-b from-game-dark to-game-darker">
+        <div class="container mx-auto px-4">
+            <div class="mb-12">
+                <span class="text-game-secondary text-sm uppercase tracking-wider">Browse by</span>
+                <h2 class="text-3xl font-bold flex items-center">Game <span class="gradient-text ml-2">Categories</span>
+                    <span class="ml-3 relative w-12 h-1">
+                        <span class="absolute inset-0 bg-game-secondary blur-sm"></span>
+                        <span class="absolute inset-0 bg-game-secondary"></span>
+                    </span>
+                </h2>
+            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Category Card 1 -->
+                <div class="group perspective">
+                    <div class="relative rounded-lg overflow-hidden h-80 transform-3d group-hover:rotate-y-6 transition-transform duration-500 shadow-neon">
+                        <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="PC Gaming" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-game-darker via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute inset-0 bg-game-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="absolute top-6 left-6">
+                            <div class="relative">
+                                <div class="w-16 h-16 rounded-full bg-game-darker flex items-center justify-center shadow-neon">
+                                    <i class="fas fa-desktop text-2xl text-game-secondary"></i>
+                                </div>
+                                <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-game-primary flex items-center justify-center text-xs font-bold text-white">
+                                    <span>12k</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 p-6 z-10">
+                            <h3 class="text-3xl font-bold mb-2 transform group-hover:translate-x-2 transition-transform">PC Games</h3>
+                            <p class="text-gray-300 mb-6 max-w-xs">Explore over 1,200 titles from AAA blockbusters to indie gems for your gaming rig.</p>
+                            <a href="#" class="inline-flex items-center text-game-secondary font-semibold group-hover:text-game-light transition">
+                                Browse Collection
+                                <span class="ml-2 transform group-hover:translate-x-2 transition-transform">
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="absolute bottom-0 right-0 w-1/3 h-1/2 bg-gradient-to-tl from-game-secondary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+                    </div>
+                </div>
+                                <!-- Category Card 2 -->
+                <div class="group perspective">
+                    <div class="relative rounded-lg overflow-hidden h-80 transform-3d group-hover:rotate-y-6 transition-transform duration-500 shadow-neon">
+                        <img src="https://images.unsplash.com/photo-1600861194942-f883de0dfe96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Console Gaming" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-game-darker via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute inset-0 bg-game-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="absolute top-6 left-6">
+                            <div class="relative">
+                                <div class="w-16 h-16 rounded-full bg-game-darker flex items-center justify-center shadow-neon">
+                                    <i class="fas fa-gamepad text-2xl text-game-secondary"></i>
+                                </div>
+                                <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-game-primary flex items-center justify-center text-xs font-bold text-white">
+                                    <span>5k</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 p-6 z-10">
+                            <h3 class="text-3xl font-bold mb-2 transform group-hover:translate-x-2 transition-transform">Consoles</h3>
+                            <p class="text-gray-300 mb-6 max-w-xs">Find the latest PS5, Xbox Series X|S, and Nintendo Switch consoles, bundles and accessories.</p>
+                            <a href="#" class="inline-flex items-center text-game-secondary font-semibold group-hover:text-game-light transition">
+                                Browse Collection
+                                <span class="ml-2 transform group-hover:translate-x-2 transition-transform">
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="absolute bottom-0 right-0 w-1/3 h-1/2 bg-gradient-to-tl from-game-secondary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+                    </div>
+                </div>
+                                <!-- Category Card 3 -->
+                <div class="group perspective">
+                    <div class="relative rounded-lg overflow-hidden h-80 transform-3d group-hover:rotate-y-6 transition-transform duration-500 shadow-neon">
+                        <img src="https://images.unsplash.com/photo-1596900779744-2bdc4a90509a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Gaming Accessories" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-game-darker via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute inset-0 bg-game-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="absolute top-6 left-6">
+                            <div class="relative">
+                                <div class="w-16 h-16 rounded-full bg-game-darker flex items-center justify-center shadow-neon">
+                                    <i class="fas fa-headset text-2xl text-game-secondary"></i>
+                                </div>
+                                <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-game-primary flex items-center justify-center text-xs font-bold text-white">
+                                    <span>8k</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 p-6 z-10">
+                            <h3 class="text-3xl font-bold mb-2 transform group-hover:translate-x-2 transition-transform">Accessories</h3>
+                            <p class="text-gray-300 mb-6 max-w-xs">Upgrade your setup with premium headsets, controllers, VR gear, and more gaming essentials.</p>
+                            <a href="#" class="inline-flex items-center text-game-secondary font-semibold group-hover:text-game-light transition">
+                                Browse Collection
+                                <span class="ml-2 transform group-hover:translate-x-2 transition-transform">
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="absolute bottom-0 right-0 w-1/3 h-1/2 bg-gradient-to-tl from-game-secondary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Hardware Section -->
+    <section id="hardware" class="py-16 bg-game-dark">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center mb-12">
+                <h2 class="text-3xl font-bold">Gaming <span class="text-game-purple">Hardware</span></h2>
+                <a href="#" class="text-game-purple hover:text-game-pink transition">View All <i class="fas fa-arrow-right ml-2"></i></a>
+            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Hardware Item 1 -->
+                <div class="bg-game-gray rounded-lg overflow-hidden hover:shadow-lg hover:shadow-game-purple/20 transition group flex flex-col">
+                    <div class="relative p-6 flex-grow">
+                        <span class="absolute top-4 right-4 text-xs bg-game-purple px-2 py-1 rounded-full">Top Seller</span>
+                        <img src="https://images.unsplash.com/photo-1591489378430-ef2f4c647fd4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Gaming PC" class="w-full h-52 object-contain">
+                        <h3 class="font-bold text-lg mt-4">Aurora R15 Gaming Desktop</h3>
+                        <p class="text-gray-400 text-sm mt-2">RTX 4080, i9-13900K, 64GB RAM, 2TB SSD</p>
+                        <div class="mt-4 flex items-center">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-sm text-gray-400 ml-2">5.0 (128)</span>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-game-darker mt-auto">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-game-purple font-bold text-2xl">$2,499.99</span>
+                                <span class="text-gray-400 line-through text-sm ml-2">$2,799.99</span>
+                            </div>
+                            <button class="bg-game-purple hover:bg-purple-700 text-white py-2 px-4 rounded-full transition">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                                <!-- Hardware Item 2 -->
+                <div class="bg-game-gray rounded-lg overflow-hidden hover:shadow-lg hover:shadow-game-purple/20 transition group flex flex-col">
+                    <div class="relative p-6 flex-grow">
+                        <span class="absolute top-4 right-4 text-xs bg-blue-500 px-2 py-1 rounded-full">New</span>
+                        <img src="https://images.unsplash.com/photo-1675267462296-657c2be7757f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="PS5" class="w-full h-52 object-contain">
+                        <h3 class="font-bold text-lg mt-4">PlayStation 5 Pro Bundle</h3>
+                        <p class="text-gray-400 text-sm mt-2">PS5 Pro, Extra Controller, 3 Games</p>
+                        <div class="mt-4 flex items-center">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-sm text-gray-400 ml-2">4.5 (87)</span>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-game-darker mt-auto">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-game-purple font-bold text-2xl">$599.99</span>
+                            </div>
+                            <button class="bg-game-purple hover:bg-purple-700 text-white py-2 px-4 rounded-full transition">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                                <!-- Hardware Item 3 -->
+                <div class="bg-game-gray rounded-lg overflow-hidden hover:shadow-lg hover:shadow-game-purple/20 transition group flex flex-col">
+                    <div class="relative p-6 flex-grow">
+                        <span class="absolute top-4 right-4 text-xs bg-green-500 px-2 py-1 rounded-full">In Stock</span>
+                        <img src="https://images.unsplash.com/photo-1626240130051-68871c71e898?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Xbox Series X" class="w-full h-52 object-contain">
+                        <h3 class="font-bold text-lg mt-4">Xbox Series X Game Pass Bundle</h3>
+                        <p class="text-gray-400 text-sm mt-2">Xbox Series X, 1 Year Game Pass Ultimate</p>
+                        <div class="mt-4 flex items-center">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="text-sm text-gray-400 ml-2">4.0 (62)</span>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-game-darker mt-auto">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-game-purple font-bold text-2xl">$549.99</span>
+                                <span class="text-gray-400 line-through text-sm ml-2">$599.99</span>
+                            </div>
+                            <button class="bg-game-purple hover:bg-purple-700 text-white py-2 px-4 rounded-full transition">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+        <!-- Deals Section -->
+    <section id="deals" class="py-16 bg-gradient-to-b from-game-dark to-game-darker">
+        <div class="container mx-auto px-4">
+            <div class="bg-gradient-to-r from-game-purple/20 to-transparent p-8 rounded-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1538481199705-c710c4e965fc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80')] bg-cover bg-center opacity-10"></div>
+                <div class="relative z-10">
+                    <h2 class="text-3xl font-bold mb-2">Flash <span class="text-game-purple">Deals</span></h2>
+                    <p class="text-gray-300 mb-8 max-w-2xl">Limited-time offers on the hottest games and gear. Hurry before they're gone!</p>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Deal Card 1 -->
+                        <div class="bg-game-gray rounded-lg overflow-hidden group">
+                            <div class="p-4 flex items-center">
+                                <div class="mr-4 relative">
+                                    <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80" alt="Gaming Headset" class="w-20 h-20 object-cover rounded">
+                                    <div class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold h-6 w-6 flex items-center justify-center rounded-full">
+                                        -50%
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm">Pro X Gaming Headset</h3>
+                                    <div class="flex items-center mt-1">
+                                        <span class="text-game-purple font-bold">$49.99</span>
+                                        <span class="text-gray-400 line-through text-xs ml-2">$99.99</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="text-xs bg-game-darker px-2 py-1 rounded-full">4h left</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                                <!-- Deal Card 2 -->
+                        <div class="bg-game-gray rounded-lg overflow-hidden group">
+                            <div class="p-4 flex items-center">
+                                <div class="mr-4 relative">
+                                    <img src="https://images.unsplash.com/photo-1614294149010-950b698f72c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80" alt="Gaming Mouse" class="w-20 h-20 object-cover rounded">
+                                    <div class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold h-6 w-6 flex items-center justify-center rounded-full">
+                                        -60%
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm">Viper Ultimate RGB Mouse</h3>
+                                    <div class="flex items-center mt-1">
+                                        <span class="text-game-purple font-bold">$39.99</span>
+                                        <span class="text-gray-400 line-through text-xs ml-2">$99.99</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="text-xs bg-game-darker px-2 py-1 rounded-full">7h left</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                                <!-- Deal Card 3 -->
+                        <div class="bg-game-gray rounded-lg overflow-hidden group">
+                            <div class="p-4 flex items-center">
+                                <div class="mr-4 relative">
+                                    <img src="https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80" alt="Gaming Chair" class="w-20 h-20 object-cover rounded">
+                                    <div class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold h-6 w-6 flex items-center justify-center rounded-full">
+                                        -40%
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm">Titan Evo Gaming Chair</h3>
+                                    <div class="flex items-center mt-1">
+                                        <span class="text-game-purple font-bold">$269.99</span>
+                                        <span class="text-gray-400 line-through text-xs ml-2">$449.99</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="text-xs bg-game-darker px-2 py-1 rounded-full">2d left</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                                <!-- Deal Card 4 -->
+                        <div class="bg-game-gray rounded-lg overflow-hidden group">
+                            <div class="p-4 flex items-center">
+                                <div class="mr-4 relative">
+                                    <img src="https://images.unsplash.com/photo-1631896928983-2c94ea6f97e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80" alt="Controller" class="w-20 h-20 object-cover rounded">
+                                    <div class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold h-6 w-6 flex items-center justify-center rounded-full">
+                                        -25%
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm">Elite Series 2 Controller</h3>
+                                    <div class="flex items-center mt-1">
+                                        <span class="text-game-purple font-bold">$149.99</span>
+                                        <span class="text-gray-400 line-through text-xs ml-2">$199.99</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="text-xs bg-game-darker px-2 py-1 rounded-full">5h left</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                        <div class="mt-8 text-center">
+                        <a href="#" class="px-8 py-3 bg-game-purple hover:bg-purple-700 rounded-full text-white font-semibold transition duration-300 inline-block">View All Deals</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+        <!-- Newsletter -->
+    <section class="py-16 bg-game-darker">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto bg-gradient-to-r from-game-purple/30 to-game-darker rounded-xl p-10 relative overflow-hidden">
+                <div class="absolute -top-12 -right-12 h-40 w-40 bg-game-purple/20 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-12 -left-12 h-40 w-40 bg-game-pink/20 rounded-full blur-3xl"></div>
+                                <div class="relative z-10 text-center">
+                    <h2 class="text-3xl font-bold mb-6">Join Our <span class="text-game-purple">Newsletter</span></h2>
+                    <p class="text-gray-300 mb-8 max-w-lg mx-auto">Subscribe to get exclusive deals, early access to sales, and the latest gaming news delivered to your inbox.</p>
+                                        <form class="max-w-lg mx-auto">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <input type="email" placeholder="Your email address" class="flex-grow px-5 py-3 rounded-full bg-game-dark border border-game-purple/30 focus:border-game-purple focus:outline-none text-white placeholder-gray-400">
+                            <button type="submit" class="px-6 py-3 bg-game-purple hover:bg-purple-700 rounded-full text-white font-semibold transition sm:w-auto w-full">Subscribe</button>
+                        </div>
+                        <p class="text-gray-400 text-xs mt-4">By subscribing, you agree to our Privacy Policy and consent to receive updates from our company.</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+        <!-- Footer -->
+    <footer class="bg-game-darker pt-16 pb-8 border-t border-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mb-16">
+                <div class="md:col-span-2">
+                    <a href="#" class="text-2xl font-bold text-white flex items-center mb-6">
+                        <span class="text-game-purple mr-2"><i class="fas fa-gamepad"></i></span>
+                        Nexus<span class="text-game-purple">Gaming</span>
+                    </a>
+                    <p class="text-gray-400 mb-6 pr-8">Your one-stop destination for all things gaming. We're passionate about delivering the best gaming products and experiences to our customers.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-game-gray flex items-center justify-center text-white hover:bg-game-purple transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-game-gray flex items-center justify-center text-white hover:bg-game-purple transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-game-gray flex items-center justify-center text-white hover:bg-game-purple transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-game-gray flex items-center justify-center text-white hover:bg-game-purple transition">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                    </div>
+                </div>
+                                <div>
+                    <h3 class="font-bold text-lg mb-6">Shop</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">PC Games</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">Console Games</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">Gaming PCs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">Consoles</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">Accessories</a></li>
+                    </ul>
+                </div>
+                                <div>
+                    <h3 class="font-bold text-lg mb-6">About</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">News</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">Press</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">Contact</a></li>
+                    </ul>
+                </div>
+                                <div>
+                    <h3 class="font-bold text-lg mb-6">Help</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">Shipping</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">Returns</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">Order Status</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-game-purple transition">Payment Options</a></li>
+                    </ul>
+                </div>
+            </div>
+                        <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm mb-4 md:mb-0">&copy; 2025 NexusGaming. All rights reserved.</p>
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-game-purple transition text-sm">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-game-purple transition text-sm">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-game-purple transition text-sm">Cookie Policy</a>
+                    <div class="flex items-center ml-4">
+                        <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" alt="Visa" class="h-6 w-auto mr-2">
+                        <img src="https://cdn-icons-png.flaticon.com/512/196/196561.png" alt="MasterCard" class="h-6 w-auto mr-2">
+                        <img src="https://cdn-icons-png.flaticon.com/512/196/196566.png" alt="PayPal" class="h-6 w-auto">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Parallax effect for hero elements
+            const heroSection = document.querySelector('.hero-section');
+            const floatingElements = document.querySelectorAll('.animate-float, .animate-float-delayed');
+                        if (heroSection) {
+                window.addEventListener('mousemove', function(e) {
+                    const moveX = (e.clientX - window.innerWidth / 2) * 0.01;
+                    const moveY = (e.clientY - window.innerHeight / 2) * 0.01;
+                                        floatingElements.forEach(element => {
+                        const speedX = element.getAttribute('data-speed-x') || 1;
+                        const speedY = element.getAttribute('data-speed-y') || 1;
+                        element.style.transform = `translate(${moveX * speedX}px, ${moveY * speedY}px)`;
+                    });
+                });
+            }
+                        // Add glitch effect to text elements on scroll
+            const glitchElements = document.querySelectorAll('.text-glitch');
+            window.addEventListener('scroll', function() {
+                glitchElements.forEach(element => {
+                    if (isElementInViewport(element)) {
+                        element.classList.add('glitching');
+                        setTimeout(() => {
+                            element.classList.remove('glitching');
+                        }, 2000); // Remove class after animation completes
+                    }
+                });
+            });
+                        // Helper function to check if element is in viewport
+            function isElementInViewport(el) {
+                const rect = el.getBoundingClientRect();
+                return (
+                    rect.top >= 0 &&
+                    rect.left >= 0 &&
+                    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+                );
+            }
+                        // Add active class to the current nav item
+            const navLinks = document.querySelectorAll('nav a');
+                        function setActiveNavItem() {
+                let currentSection = '';
+                const sections = document.querySelectorAll('section');
+                                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (window.scrollY >= sectionTop - 100) {
+                        currentSection = section.getAttribute('id');
+                    }
+                });
+                                navLinks.forEach(link => {
+                    link.classList.remove('text-game-primary');
+                    const href = link.getAttribute('href');
+                    if (href && href.includes(currentSection)) {
+                        link.classList.add('text-game-primary');
+                    }
+                });
+            }
+                        window.addEventListener('scroll', setActiveNavItem);
+            setActiveNavItem(); // Set active on page load
+        });
+    </script>
+    <!-- Hacker Terminal Intro Effect -->
+    <script src="terminal.js"></script>
+    <!-- Click-to-start script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create click-to-start overlay
+            const startOverlay = document.createElement('div');
+            startOverlay.id = 'start-overlay';
+            startOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+                z-index: 10000;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: #0f0;
+                font-family: 'Share Tech Mono', monospace;
+            `;
+            
+            startOverlay.innerHTML = `
+                <h1 style="color: #0f0; text-shadow: 0 0 5px #0f0; font-size: 24px; margin-bottom: 20px;">CLICK TO INITIALIZE SYSTEM</h1>
+                <div style="border: 1px solid #0f0; padding: 10px 20px; box-shadow: 0 0 10px #0f0;">START</div>
+            `;
+            
+            document.body.appendChild(startOverlay);
+            
+            // Add click event to start
+            startOverlay.addEventListener('click', function() {
+                // Remove overlay
+                startOverlay.style.opacity = '0';
+                setTimeout(() => startOverlay.remove(), 500);
+                
+                console.log('Start overlay clicked, now initializing terminal');
+                
+                // Initialize the actual terminal script
+                if (window.initHackerTerminal) {
+                    console.log('initHackerTerminal function found, executing');
+                    window.initHackerTerminal();
+                } else {
+                    console.error('ERROR: initHackerTerminal function not found!');
+                    alert('Terminal script not loaded correctly. Please refresh the page.');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
